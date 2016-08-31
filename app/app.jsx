@@ -12,10 +12,6 @@ store.subscribe(() => {
   console.log('New state', store.getState());
 });
 
-store.dispatch(actions.addTodo('Take Hannah to the hairdressers'));
-store.dispatch(actions.setSearchText('hannah'));
-store.dispatch(actions.toggleShowCompleted());
-
 // Load foundation
 $(document).foundation();
 
