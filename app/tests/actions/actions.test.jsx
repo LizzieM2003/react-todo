@@ -97,17 +97,44 @@ describe('actions', () => {
     var testTodoRef;
 
     beforeEach((done) => {
-      testTodoRef = firebaseRef.child('todos').push();
+      var todosRef = firebaseRef.child('todos');
 
-      testTodoRef.set({
-        text: 'Something to do',
-        completed: false,
-        createdAt: 2345678
-      }).then(() => done());
+      todosRef.remove().then(() => {
+        testTodoRef = firebaseRef.child('todos').push();
+
+        return testTodoRef.set({
+          text: 'Something to do',
+          completed: false,
+          createdAt: 2345678
+        })
+      })
+      .then(() => done())
+      .catch(done);
     });
 
     afterEach((done) => {
       testTodoRef.remove().then(() => done());
+    });
+
+    it('should get todos from firebase on start', (done) => {
+      const store = createMockStore({});
+      const action = actions.startAddTodos();
+
+      store.dispatch(action).then(() => {
+        const mockActions = store.getActions();
+
+        expect(mockActions[0].type).toEqual('ADD_TODOS');
+
+        expect(mockActions[0].todos).toInclude({
+          text: 'Something to do',
+          completed: false,
+          createdAt: 2345678
+        });
+
+        expect(mockActions[0].todos.length).toEqual(1);
+        done();
+      }, done);
+       done();
     });
 
     it('should toggle todo and dispatch UPDATE_TODO action', (done) => {
@@ -128,7 +155,7 @@ describe('actions', () => {
 
         expect(mockActions[0].updates.completedAt).toExist();
         done();
-      });
+      },done);
     });
   });
 });
